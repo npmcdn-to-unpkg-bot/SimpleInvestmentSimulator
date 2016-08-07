@@ -9,7 +9,7 @@
 	<div id="container"></div>
 <!-- 	<script src="js/lib/react-15.3.0/build/react-with-addons.js"></script>
 	<script src="js/lib/react-15.3.0/build/react-dom.js"></script>
-	<script type="js/lib/react-15.3.0/build/react-dom-server.js"></script>
+	<script src="js/lib/react-15.3.0/build/react-dom-server.js"></script>
  -->	<script src="https://npmcdn.com/react@15.3.0/dist/react.js"></script>
     <script src="https://npmcdn.com/react-dom@15.3.0/dist/react-dom.js"></script>
     <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
@@ -78,11 +78,17 @@
 		var TransactionBar = React.createClass({
 			render: function() {
 				return(
-					<div className="currentStockInput">
-						<input value="" placeholder="Quantity"></input>
-						<input type="button" value="Buy"></input>
-						<input type="button" value="Sell"></input>
-					</div>
+					<tr className="currentStockInput">
+						<td>
+							<input value="" placeholder="Quantity"></input>
+						</td>
+						<td>
+							<input type="button" value="Buy"></input>
+						</td>
+						<td>
+							<input type="button" value="Sell"></input>
+						</td>
+					</tr>
 				);
 			}
 		});
@@ -106,28 +112,61 @@
 			}
 		});
 
-		var StockNameRow = React.createClass({
-			render: function() {
-				var name = this.props.investments[1].name;
-				var symbol = this.props.investments[1].symbol;
-				return (
-					<div>
-						<h3>{name}</h3>
-						<h3> ({symbol})</h3>
-					</div>
-				);
-			}
-		});
-
 		var CurrentStockTable = React.createClass({
+			getInitialState: function() {
+				return {
+					stockName: '',
+					symbol: '',
+					ask: 0,
+					bid: 0
+				};
+			},
+			handleSymbolSubmit: function(stockSymbol) {
+				var currentStock = this.state.data
+				this.setState({data: currentStock});
+				$.ajax({
+					url: this.props.url,
+					dataType: 'json',
+					type: 'GET',
+					data: stockSymbol,
+					success: function(result) {
+						console.log(result);
+						var stockData = result[0];
+						this.setState({
+							stockName: stockData.name,
+							symbol: stockSymbol,
+							ask: stockData.askPrice,
+							bid: stockData.bidPrice
+						});
+					}.bind(this),
+					error: function(xhr, status, err) {
+						console.error(this.props.url, status, err.toString());
+					}.bind(this)
+				});
+			},
+			componentDidMount: function() {
+				this.getInitialState();
+			}, 
 			render: function() {
 				return (
 					<table className= "currentStock">
-						<th>
-							<StockNameRow investments={this.props.investments} />
-						</th>
+						<thead>
+							<tr>{this.state.stockName}</tr>
+							<tr>{this.state.symbol}</tr>
+						</thead>
 						<tbody>
-							<CurrentPricesTable investments={this.props.investments} />
+							<tr>
+								<th>Bid</th>
+								<th>Ask</th>
+							</tr>
+							<tr>
+								<td>
+									{this.state.bid}
+								</td>
+								<td>
+									{this.state.ask}
+								</td>
+							</tr>
 							<TransactionBar />
 						</tbody>
 					</table>
@@ -141,7 +180,7 @@
 					<div>
 						<h1 style={{float: "left"}}>Simple Investment Simulator</h1>
 						<input value="Lookup" type="button" className="symbolInput"></input>
-						<input value="" placeholder="Enter Symbol" className="symbolInput"></input>
+						<input type="search" value="" placeholder="Enter Symbol" className="symbolInput"></input>
 					</div>
 				);
 			}
@@ -152,7 +191,7 @@
 				return (
 					<div>
 						<SearchBar />
-						<CurrentStockTable investments={INVESTMENTS} />
+						<CurrentStockTable url="http://data.benzinga.com/rest/richquoteDelayed?symbols=" />
 						<InvestmentPortfolioTable investments={INVESTMENTS} />
 					</div>
 				);
