@@ -126,15 +126,37 @@
 					}.bind(this)
 				});
 			},
+			loadCurrentState: function() {
+				$.ajax({
+					url: this.props.url,
+					dataType: 'json',
+					cache: false,
+					data: this.state.symbol,
+					success: function(result) {
+						console.log(result);
+						var stockData = result[0];
+						this.setState({
+							stockName: stockData.name,
+							symbol: stockSymbol,
+							ask: stockData.askPrice,
+							bid: stockData.bidPrice
+						});
+					}.bind(this),
+					error: function(xhr, status, err) {
+						console.error(this.props.url, status, err.toString());
+					}.bind(this)
+				});				
+			},
 			componentDidMount: function() {
-				this.getInitialState();
+				this.loadCurrentState();
+				setInterval(this.loadCurrentState, this.props.pollInterval);
 			}, 
 			render: function() {
 				return (
 					<table className= "currentStock">
 						<thead>
 							<tr>{this.state.stockName}</tr>
-							<tr>{this.state.symbol}</tr>
+							<tr> ({this.state.symbol})</tr>
 						</thead>
 						<tbody>
 							<tr>
@@ -173,7 +195,7 @@
 				return (
 					<div>
 						<SearchBar />
-						<CurrentStockTable url="http://data.benzinga.com/rest/richquoteDelayed?symbols=" />
+						<CurrentStockTable url="http://data.benzinga.com/rest/richquoteDelayed?symbols=" pollInterval={200000} />
 						<InvestmentPortfolioTable investments={INVESTMENTS} />
 					</div>
 				);
@@ -209,7 +231,7 @@
 			document.getElementById('container')
     	);
     </script>
-	<!-- <script src="js/lib/jquery-3.1.0.min.js"></script> -->
+	<script src="js/lib/jquery-3.1.0.min.js"></script>
 	<!-- <script type="text/babel" src="js/app.js"></script> -->
 </body>
 </html>
