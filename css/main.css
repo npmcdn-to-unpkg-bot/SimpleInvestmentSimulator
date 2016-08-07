@@ -1,0 +1,59 @@
+table{
+	border-collapse: collapse;
+}
+
+table, th, tr, td {
+	border: 1px solid black;
+	text-align: center;
+}
+
+h3 {
+	display: inline;
+}
+
+.symbolInput {
+	float: right;
+	margin-top: 40px;
+}
+
+.currentStock {
+	position: absolute;
+	left: 0px;
+	margin-left: 10%;
+	width: 25%;
+}
+
+.portfolio {
+	position: absolute;
+	right: 0px;
+	margin-right: 10%;
+	width: 35%;
+}
+
+.currentStock,
+.portfolio {
+	margin-top: 100px;
+}
+
+
+.currentStockHeader {
+	width: 220px;
+	height: 30px;
+}
+
+.currentStockData {
+	height: 100px;
+}
+
+.currentStockInput {
+	text-align: left;
+}
+
+.currentPortfolioHeader {
+	width: 150px;
+	height: 30px;
+}
+
+.currentPortfolioData {
+	height: 40px;
+}
