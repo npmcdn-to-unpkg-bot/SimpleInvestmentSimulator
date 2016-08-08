@@ -61,71 +61,141 @@ var InvestmentPortfolioTable = React.createClass({
 var TransactionBar = React.createClass({
 	render: function() {
 		return(
-			<div className="currentStockInput">
-				<input value="" placeholder="Quantity"></input>
-				<input type="button" value="Buy"></input>
-				<input type="button" value="Sell"></input>
-			</div>
-		);
-	}
-});
-
-var CurrentPricesTable = React.createClass({
-	render: function() {
-		var bid = this.props.investments[1].bidPrice;
-		var ask = this.props.investments[1].askPrice;
-		return (
-			<tbody>
-				<tr>
-					<th className="currentStockHeader">Bid</th>
-					<th className="currentStockHeader">Ask</th>
-				</tr>
-				<tr>
-					<td className="currentStockData">{bid}</td>
-					<td>{ask}</td>
-				</tr>
-			</tbody>
-		);
-	}
-});
-
-var StockNameRow = React.createClass({
-	render: function() {
-		var name = this.props.investments[1].name;
-		var symbol = this.props.investments[1].symbol;
-		return (
-			<div>
-				<h3>{name}</h3>
-				<h3> ({symbol})</h3>
-			</div>
+			<tr className="currentStockInput">
+				<td>
+					<input type="text" value="" placeholder="Quantity"></input>
+				</td>
+				<td>
+					<input type="button" value="Buy"></input>
+				</td>
+				<td>
+					<input type="button" value="Sell"></input>
+				</td>
+			</tr>
 		);
 	}
 });
 
 var CurrentStockTable = React.createClass({
+	getInitialState: function() {
+		return {
+			stockName: '',
+			symbol: '',
+			ask: 0,
+			bid: 0
+		};
+	},
+	handleSymbolSubmit: function(stockSymbol) {
+		var stock_symbol = stockSymbol.symbols;
+		console.log(stock_symbol);
+		$.ajax({
+			url: this.props.url,
+			dataType: 'jsonp',
+			type: 'GET',
+			data: stockSymbol,
+			success: function(result) {
+				console.log(result.stock_symbol);
+				console.log(result.JNJ === result.stock_symbol);
+				var stockData = result.JNJ;
+				this.setState({
+					stockName: stockData.name,
+					symbol: stock_symbol,
+					ask: stockData.askPrice,
+					bid: stockData.bidPrice
+				});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+				alert('No stock found!')
+			}.bind(this)
+		});
+	},
+	loadCurrentState: function() {
+		$.ajax({
+			url: this.props.url,
+			dataType: 'jsonp',
+			cache: false,
+			data: this.state.symbol,
+			success: function(result) {
+				var stockData = result[0];
+				this.setState({
+					ask: stockData.askPrice,
+					bid: stockData.bidPrice
+				});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+			}.bind(this)
+		});				
+	},
+	componentDidMount: function() {
+		this.loadCurrentState();
+		setInterval(this.loadCurrentState, this.props.pollInterval);
+	}, 
 	render: function() {
 		return (
-			<table className= "currentStock">
-				<th>
-					<StockNameRow investments={this.props.investments} />
-				</th>
-				<tbody>
-					<CurrentPricesTable investments={this.props.investments} />
-					<TransactionBar />
-				</tbody>
-			</table>
+			<div>
+				<SearchBar onSymbolSubmit={this.handleSymbolSubmit} />
+				<table className= "currentStock">
+					<thead>
+						<th>{this.state.stockName}</th>
+						<th> {this.state.symbol}</th>
+					</thead>
+					<tbody>
+						<tr>
+							<th>Bid</th>
+							<th>Ask</th>
+						</tr>
+						<tr>
+							<td>
+								{this.state.bid}
+							</td>
+							<td>
+								{this.state.ask}
+							</td>
+						</tr>
+						<TransactionBar />
+					</tbody>
+				</table>
+			</div>
 		);
 	}
 });
 
 var SearchBar = React.createClass({
+	getInitialState: function() {
+		return {symbols: ''};
+	},
+	handleSymbolChange: function(e) {
+		this.setState({
+			symbols: e.target.value
+		});
+	},
+	handleSubmit: function(e) {
+		e.preventDefault();
+		var symbol = this.state.symbols.trim();
+		if (!symbol) {
+			return;
+		}
+		this.props.onSymbolSubmit({symbols: symbol});
+		this.setState({symbols: ''});
+	},
 	render: function() {
 		return (
-			<div>
-				<h1 style={{float: "left"}}>Simple Investment Simulator</h1>
-				<input value="Lookup" type="button" className="symbolInput"></input>
-				<input value="" placeholder="Enter Symbol" className="symbolInput"></input>
-			</div>
+			<form onSubmit={this.handleSubmit}>
+				<input 
+					value="Search" 
+					type="submit" 
+					className="symbolInput"
+				/>
+				<input 
+					type="text" 
+					value={this.state.symbols}
+					onChange={this.handleSymbolChange} 
+					placeholder="Enter Stock Symbol" 
+					className="symbolInput" 
+				/>
+			</form>
 		);
 	}
 });
@@ -134,8 +204,7 @@ var SearchableInvestmentTable = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<SearchBar />
-				<CurrentStockTable investments={INVESTMENTS} />
+				<CurrentStockTable url="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={200000} />
 				<InvestmentPortfolioTable investments={INVESTMENTS} />
 			</div>
 		);
