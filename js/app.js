@@ -1,13 +1,24 @@
+var rows, cash;
+
+var CurrentPortfolioRow = React.createClass({
+	render: function() {
+		cash = 100000;
+		return (
+			<tr>
+				<th>Current portfolio</th>
+				<th>Available Cash: {cash}</th>
+			</tr>
+		);
+	}
+});
+
 var InvestmentRow = React.createClass({
 	render: function() {
-		var name = this.props.investment.name;
-		var price = this.props.investment.askPrice;
-		var quantity = this.props.investment.quantity;
 		return (
 			<tr className="currentPortfolioData">
-				<td>{name}</td>
-				<td>{quantity}</td>
-				<td>{price}</td>
+				<td>{this.props.stockName}</td>
+				<td>{this.props.shares}</td>
+				<td>{this.props.askPrice}</td>
 				<input className="currentPortfolioData" type="button" value="View Stock"></input>
 			</tr>
 		);
@@ -16,10 +27,7 @@ var InvestmentRow = React.createClass({
 
 var InvestmentTable = React.createClass({
 	render: function() {
-		var rows = [];
-		this.props.investments.forEach(function(investment) {
-			rows.push(<InvestmentRow investment={investment} key = {investment.name} />);
-		});
+		rows = [];
 		return (
 			<table>
 				<thead>
@@ -33,17 +41,6 @@ var InvestmentTable = React.createClass({
 	}
 });
 
-var CurrentPortfolioRow = React.createClass({
-	render: function() {
-		var cash = 100000;
-		return (
-			<div>
-				<h3 style={{float: "left"}}>Current Portfolio</h3>
-				<h3 style={{float: "right"}}>Cash: {cash}</h3>
-			</div>
-		);
-	}
-});
 
 var InvestmentPortfolioTable = React.createClass({
 	render: function() {
@@ -52,94 +49,21 @@ var InvestmentPortfolioTable = React.createClass({
 				<thead>
 					<CurrentPortfolioRow />
 				</thead>
-				<InvestmentTable investments={this.props.investments} />
+				<InvestmentTable />
 			</table>
 		);
 	}
 });
 
-var TransactionBar = React.createClass({
-	render: function() {
-		return(
-			<tr className="currentStockInput">
-				<td>
-					<input type="text" value="" placeholder="Quantity"></input>
-				</td>
-				<td>
-					<input type="button" value="Buy"></input>
-				</td>
-				<td>
-					<input type="button" value="Sell"></input>
-				</td>
-			</tr>
-		);
-	}
-});
 
 var CurrentStockTable = React.createClass({
-	getInitialState: function() {
-		return {
-			stockName: '',
-			symbol: '',
-			ask: 0,
-			bid: 0
-		};
-	},
-	handleSymbolSubmit: function(stockSymbol) {
-		var stock_symbol = stockSymbol.symbols;
-		console.log(stock_symbol);
-		$.ajax({
-			url: this.props.url,
-			dataType: 'jsonp',
-			type: 'GET',
-			data: stockSymbol,
-			success: function(result) {
-				console.log(result.stock_symbol);
-				console.log(result.JNJ === result.stock_symbol);
-				var stockData = result.JNJ;
-				this.setState({
-					stockName: stockData.name,
-					symbol: stock_symbol,
-					ask: stockData.askPrice,
-					bid: stockData.bidPrice
-				});
-			}.bind(this),
-			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-				alert('No stock found!')
-			}.bind(this)
-		});
-	},
-	loadCurrentState: function() {
-		$.ajax({
-			url: this.props.url,
-			dataType: 'jsonp',
-			cache: false,
-			data: this.state.symbol,
-			success: function(result) {
-				var stockData = result[0];
-				this.setState({
-					ask: stockData.askPrice,
-					bid: stockData.bidPrice
-				});
-			}.bind(this),
-			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-			}.bind(this)
-		});				
-	},
-	componentDidMount: function() {
-		this.loadCurrentState();
-		setInterval(this.loadCurrentState, this.props.pollInterval);
-	}, 
 	render: function() {
 		return (
 			<div>
-				<SearchBar onSymbolSubmit={this.handleSymbolSubmit} />
 				<table className= "currentStock">
 					<thead>
-						<th>{this.state.stockName}</th>
-						<th> {this.state.symbol}</th>
+						<th>{this.props.stockName}</th>
+						<th> {this.props.symbol}</th>
 					</thead>
 					<tbody>
 						<tr>
@@ -148,13 +72,12 @@ var CurrentStockTable = React.createClass({
 						</tr>
 						<tr>
 							<td>
-								{this.state.bid}
+								{this.props.bid}
 							</td>
 							<td>
-								{this.state.ask}
+								{this.props.ask}
 							</td>
 						</tr>
-						<TransactionBar />
 					</tbody>
 				</table>
 			</div>
@@ -200,12 +123,94 @@ var SearchBar = React.createClass({
 	}
 });
 
+var TransactionBar = React.createClass({
+	getInitialState: function() {
+		return {shares: ''};
+	},
+	handleQuantityChange: function(e) {
+		this.setState({
+			shares: e.target.value
+		});
+	},
+	handlePurchase: function(e) {
+		e.preventDefault();
+		var quantity = this.props.shares;
+		if(!quantity) {
+			return;
+		}
+		this.props.onBuySubmit({
+			shares: quantity
+		});
+		this.setState({
+			shares: ''
+		});
+	},	
+	render: function() {
+		return (
+			<form className="currentStockInput" onSubmit={this.handlePurchase}>
+				<input 
+					type="text" 
+					value={this.props.shares}
+					onChange={this.handleQuantityChange}
+					placeholder="How many shares?"
+				/>
+				<input 
+					type="submit" 
+					value="Buy" 
+				/>
+				<input type="submit" value="Sell" />
+			</form>
+		);
+	}
+});
+
 var SearchableInvestmentTable = React.createClass({
+	getInitialState: function() {
+		return {
+			stockName: '',
+			symbol: '',
+			askPrice: '',
+			bidPrice: '',
+			shares: ''
+		};
+	},
+	handleSymbolSubmit: function(stockSymbol) {
+		var stock_symbol = stockSymbol.symbols;
+		console.log(stock_symbol);
+		$.ajax({
+			url: this.props.apiURL,
+			dataType: 'jsonp',
+			type: 'GET',
+			data: stockSymbol,
+			success: function(result) {
+				console.log(result.stock_symbol);
+				console.log(result.JNJ === result.stock_symbol);
+				var stockData = result.JNJ;
+				this.setState({
+					stockName: stockData.name,
+					symbol: stock_symbol,
+					askPrice: stockData.askPrice,
+					bidPrice: stockData.bidPrice
+				});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+				alert('No stock found!')
+			}.bind(this)
+		});
+	},
 	render: function() {
 		return (
 			<div>
-				<CurrentStockTable url="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={200000} />
-				<InvestmentPortfolioTable investments={INVESTMENTS} />
+				<SearchBar onSymbolSubmit={this.handleSymbolSubmit} />
+				<CurrentStockTable 
+					stockName={this.state.stockName}
+					symbol={this.state.symbol}
+					bid={this.state.bidPrice}
+					ask={this.state.askPrice}  
+				/>
+				<TransactionBar />
+				<InvestmentPortfolioTable investments={INVESTMENTS} url="investments.json" />
 			</div>
 		);
 	}
@@ -236,6 +241,6 @@ var INVESTMENTS = [
 ];
 
 ReactDOM.render(
-	<SearchableInvestmentTable investments={INVESTMENTS} />,
+	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={200000} />,
 	document.getElementById('container')
 );
