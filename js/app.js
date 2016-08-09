@@ -91,7 +91,7 @@ var SearchBar = React.createClass({
 	},
 	handleSymbolChange: function(e) {
 		this.setState({
-			symbols: e.target.value
+			symbols: e.target.value.toUpperCase()
 		});
 	},
 	handleSubmit: function(e) {
@@ -134,26 +134,22 @@ var TransactionBar = React.createClass({
 	},
 	handlePurchase: function(e) {
 		e.preventDefault();
-		var quantity = this.state.shares;
+		var quantity = this.state.shares.trim();
 		if(!quantity) {
 			return;
 		}
-		this.props.onBuySubmit({
-			shares: quantity
-		});
+		this.props.onBuySubmit({shares: quantity});
+		this.setState({shares: ''});		
 	// 	// this.props.onBuySubmit(function(e) {
 	// 	// 	rows.push(<InvestmentRow stockName={this.state.stockName} shares={this.state.shares} askPrice={this.state.askPrice} />);
 	// 	// });	
-		this.setState({
-			shares: ''
-		});
 	},	
 	render: function() {
 		return (
 			<form className="currentStockInput" onSubmit={this.handlePurchase}>
 				<input 
 					type="text" 
-					value={this.props.shares}
+					value={this.state.shares}
 					onChange={this.handleQuantityChange}
 					placeholder="How many shares?"
 				/>
@@ -181,23 +177,27 @@ var SearchableInvestmentTable = React.createClass({
 		};
 	},
 	handleSymbolSubmit: function(stockSymbol) {
+		var self = this;
 		var stock_symbol = stockSymbol.symbols;
-		console.log(stock_symbol);
 		$.ajax({
 			url: this.props.apiURL,
 			dataType: 'jsonp',
 			type: 'GET',
 			data: stockSymbol,
 			success: function(result) {
-				console.log(result.stock_symbol);
-				console.log(result.JNJ === result.stock_symbol);
-				var stockData = result.JNJ;
-				this.setState({
-					stockName: stockData.name,
-					symbol: stock_symbol,
-					askPrice: stockData.askPrice,
-					bidPrice: stockData.bidPrice
-				});
+				Object.keys(result).forEach(function(prop) {
+					var stockData = result[prop];
+					console.log(stockData.error);
+					if(stockData.error) {
+						alert('No stock found!')
+					}
+					self.setState({
+						stockName: stockData.name,
+						symbol: stockData.symbol,
+						askPrice: stockData.askPrice,
+						bidPrice: stockData.bidPrice
+					});
+				})
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.error(this.props.url, status, err.toString());
@@ -207,7 +207,6 @@ var SearchableInvestmentTable = React.createClass({
 	},
 	handleInvestment: function(quantity) {
 		var quantity = quantity.shares;
-		console.log(quantity);
 		this.setState({
 			company: this.state.stockName,
 			purchasePrice: this.state.askPrice,
