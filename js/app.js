@@ -1,8 +1,8 @@
-var rows, cash;
+// var rows, cash;
 
 var CurrentPortfolioRow = React.createClass({
 	render: function() {
-		cash = 100000;
+		var cash = this.props.cash;
 		return (
 			<tr>
 				<th>Current portfolio</th>
@@ -34,6 +34,9 @@ var InvestmentTable = React.createClass({
 		return (
 			<table className="portfolio">
 				<thead>
+					<CurrentPortfolioRow cash={this.props.cash} />
+				</thead>
+				<thead>
 					<th className="currentPortfolioHeader">Company</th>
 					<th className="currentPortfolioHeader">Quantity</th>
 					<th className="currentPortfolioHeader">Price Paid</th>
@@ -50,9 +53,6 @@ var InvestmentPortfolioTable = React.createClass({
 	render: function() {
 		return (
 			<table className="portfolio">
-				<thead>
-					<CurrentPortfolioRow />
-				</thead>
 				<InvestmentTable rows={this.props.rows} />
 			</table>
 		);
@@ -177,7 +177,7 @@ var SearchableInvestmentTable = React.createClass({
 			purchasePrice: '',
 			bidPrice: '',
 			shares: '',
-			rows: []
+			cash: 100000
 		};
 	},
 	handleSymbolSubmit: function(stockSymbol) {
@@ -210,11 +210,15 @@ var SearchableInvestmentTable = React.createClass({
 	},
 	handleInvestment: function(quantity) {
 		var quantity = quantity.shares;
-		var investments = this.state.rows;
+		var price= this.state.askPrice;
+		var totalPrice= price * quantity;
+		var currentCash= this.state.cash;
+		var availableCash= currentCash - totalPrice;
 		this.setState({
 			company: this.state.stockName,
 			purchasePrice: this.state.askPrice,
-			shares: quantity
+			shares: quantity,
+			cash: availableCash
 		});
 		INVESTMENTS.push({
 			company: this.state.stockName,
@@ -235,6 +239,7 @@ var SearchableInvestmentTable = React.createClass({
 				<TransactionBar onBuySubmit={this.handleInvestment} />
 				<InvestmentTable 
 					investments={this.props.investments}
+					cash={this.state.cash}
 				/>
 			</div>
 		);
@@ -247,3 +252,6 @@ ReactDOM.render(
 	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" investments={INVESTMENTS} pollInterval={200000} />,
 	document.getElementById('container')
 );
+
+
+
