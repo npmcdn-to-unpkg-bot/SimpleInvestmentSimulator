@@ -27,15 +27,19 @@ var InvestmentRow = React.createClass({
 
 var InvestmentTable = React.createClass({
 	render: function() {
+		var investmentRows = [];
+		this.props.investments.forEach(function(investment) {
+			investmentRows.push(<InvestmentRow stockName={investment.company} askPrice={investment.purchasePrice} shares={investment.quantity} />)
+		});
 		return (
-			<table>
+			<table className="portfolio">
 				<thead>
 					<th className="currentPortfolioHeader">Company</th>
 					<th className="currentPortfolioHeader">Quantity</th>
 					<th className="currentPortfolioHeader">Price Paid</th>
 				</thead>
 				<tbody>
-					<InvestmentRow stockName={this.props.stockName} askPrice={this.props.askPrice} shares={this.props.shares} />
+					{investmentRows}
 				</tbody>
 			</table>
 		);
@@ -60,7 +64,7 @@ var CurrentStockTable = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<table className= "currentStock">
+				<table className="currentStock">
 					<thead>
 						<th>{this.props.stockName}</th>
 						<th> {this.props.symbol}</th>
@@ -187,7 +191,6 @@ var SearchableInvestmentTable = React.createClass({
 			success: function(result) {
 				Object.keys(result).forEach(function(prop) {
 					var stockData = result[prop];
-					console.log(stockData.error);
 					if(stockData.error) {
 						alert('No stock found!')
 					}
@@ -207,10 +210,16 @@ var SearchableInvestmentTable = React.createClass({
 	},
 	handleInvestment: function(quantity) {
 		var quantity = quantity.shares;
+		var investments = this.state.rows;
 		this.setState({
 			company: this.state.stockName,
 			purchasePrice: this.state.askPrice,
 			shares: quantity
+		});
+		INVESTMENTS.push({
+			company: this.state.stockName,
+			purchasePrice: this.state.askPrice,
+			quantity: quantity
 		});
 	},
 	render: function() {
@@ -225,40 +234,16 @@ var SearchableInvestmentTable = React.createClass({
 				/>
 				<TransactionBar onBuySubmit={this.handleInvestment} />
 				<InvestmentTable 
-					stockName={this.state.company}
-					askPrice={this.state.purchasePrice}
-					shares={this.state.shares}
+					investments={this.props.investments}
 				/>
 			</div>
 		);
 	}
 });
 
-var INVESTMENTS = [
-	{
-	    name : "Ford Motor",
-	    symbol: "F",
-	    bidPrice : 12.19,
-	    askPrice : 12.23,
-	    quantity : 400
-	},
-	{
-		name : "General Electric",
-		symbol: "GE",
-		bidPrice : 31.23,
-		askPrice: 31.27,
-		quantity: 50
-	},
-	{
-		name: "Johnson and Johnson",
-		symbol: "JNJ",
-		bidPrice: 124.02,
-		askPrice: 124.49,
-		quantity: 100
-	}
-];
+var INVESTMENTS = [];
 
 ReactDOM.render(
-	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={200000} />,
+	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" investments={INVESTMENTS} pollInterval={200000} />,
 	document.getElementById('container')
 );
