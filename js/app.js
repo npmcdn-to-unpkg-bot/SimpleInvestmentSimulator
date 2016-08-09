@@ -27,7 +27,6 @@ var InvestmentRow = React.createClass({
 
 var InvestmentTable = React.createClass({
 	render: function() {
-		rows = [];
 		return (
 			<table>
 				<thead>
@@ -35,12 +34,13 @@ var InvestmentTable = React.createClass({
 					<th className="currentPortfolioHeader">Quantity</th>
 					<th className="currentPortfolioHeader">Price Paid</th>
 				</thead>
-				<tbody>{rows}</tbody>
+				<tbody>
+					<InvestmentRow stockName={this.props.stockName} askPrice={this.props.askPrice} shares={this.props.shares} />
+				</tbody>
 			</table>
 		);
 	}
 });
-
 
 var InvestmentPortfolioTable = React.createClass({
 	render: function() {
@@ -49,7 +49,7 @@ var InvestmentPortfolioTable = React.createClass({
 				<thead>
 					<CurrentPortfolioRow />
 				</thead>
-				<InvestmentTable />
+				<InvestmentTable rows={this.props.rows} />
 			</table>
 		);
 	}
@@ -134,13 +134,16 @@ var TransactionBar = React.createClass({
 	},
 	handlePurchase: function(e) {
 		e.preventDefault();
-		var quantity = this.props.shares;
+		var quantity = this.state.shares;
 		if(!quantity) {
 			return;
 		}
 		this.props.onBuySubmit({
 			shares: quantity
 		});
+	// 	// this.props.onBuySubmit(function(e) {
+	// 	// 	rows.push(<InvestmentRow stockName={this.state.stockName} shares={this.state.shares} askPrice={this.state.askPrice} />);
+	// 	// });	
 		this.setState({
 			shares: ''
 		});
@@ -158,7 +161,7 @@ var TransactionBar = React.createClass({
 					type="submit" 
 					value="Buy" 
 				/>
-				<input type="submit" value="Sell" />
+				<input type="button" value="Sell" />
 			</form>
 		);
 	}
@@ -168,10 +171,13 @@ var SearchableInvestmentTable = React.createClass({
 	getInitialState: function() {
 		return {
 			stockName: '',
+			company: '',
 			symbol: '',
 			askPrice: '',
+			purchasePrice: '',
 			bidPrice: '',
-			shares: ''
+			shares: '',
+			rows: []
 		};
 	},
 	handleSymbolSubmit: function(stockSymbol) {
@@ -199,6 +205,15 @@ var SearchableInvestmentTable = React.createClass({
 			}.bind(this)
 		});
 	},
+	handleInvestment: function(quantity) {
+		var quantity = quantity.shares;
+		console.log(quantity);
+		this.setState({
+			company: this.state.stockName,
+			purchasePrice: this.state.askPrice,
+			shares: quantity
+		});
+	},
 	render: function() {
 		return (
 			<div>
@@ -209,8 +224,12 @@ var SearchableInvestmentTable = React.createClass({
 					bid={this.state.bidPrice}
 					ask={this.state.askPrice}  
 				/>
-				<TransactionBar />
-				<InvestmentPortfolioTable investments={INVESTMENTS} url="investments.json" />
+				<TransactionBar onBuySubmit={this.handleInvestment} />
+				<InvestmentTable 
+					stockName={this.state.company}
+					askPrice={this.state.purchasePrice}
+					shares={this.state.shares}
+				/>
 			</div>
 		);
 	}
