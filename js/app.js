@@ -293,4 +293,10 @@ ReactDOM.render(
 );
 
 
+// Alerts
+
+// Alert if cash will go negative if purchase is made
+
+// Alert if quantity being sold is not available.
+
 
