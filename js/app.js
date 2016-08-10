@@ -6,7 +6,7 @@ var CurrentPortfolioRow = React.createClass({
 		return (
 			<tr>
 				<th>Current portfolio</th>
-				<th>Available Cash: {cash}</th>
+				<th>Available Cash: ${cash}</th>
 			</tr>
 		);
 	}
@@ -240,6 +240,10 @@ var SearchableInvestmentTable = React.createClass({
 	},
 	handleInvestmentSale: function(quantity) {
 		var quantity = parseInt(quantity.shares);
+		var value= this.state.bidPrice;
+		var totalValue= value * quantity;
+		var currentCash= this.state.cash;
+		var availableCash= currentCash + totalValue;
 		var currentStock = this.state.stockName;
 		var symbol = this.state.symbol;
 		var investments = this.state.investments;
@@ -247,6 +251,9 @@ var SearchableInvestmentTable = React.createClass({
 			if (investments[i].company === currentStock) {
 				var investment = document.getElementById(symbol);
 				$(investment).find('#shares').text(investments[i].quantity -= quantity);
+				this.setState({
+					cash: availableCash
+				});
 				if (investments[i].quantity <= 0) {
 					investment.remove();
 				}
