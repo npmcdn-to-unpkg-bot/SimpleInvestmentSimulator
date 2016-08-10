@@ -1,4 +1,4 @@
-// var rows, cash;
+var investmentRows;
 
 var CurrentPortfolioRow = React.createClass({
 	render: function() {
@@ -15,10 +15,10 @@ var CurrentPortfolioRow = React.createClass({
 var InvestmentRow = React.createClass({
 	render: function() {
 		return (
-			<tr className="currentPortfolioData">
-				<td>{this.props.stockName}</td>
-				<td>{this.props.shares}</td>
-				<td>{this.props.askPrice}</td>
+			<tr className="currentPortfolioData" id={this.props.id}>
+				<td id="name">{this.props.stockName}</td>
+				<td id="shares">{this.props.shares}</td>
+				<td id="paid">{this.props.askPrice}</td>
 				<input className="currentPortfolioData" type="button" value="View Stock"></input>
 			</tr>
 		);
@@ -27,9 +27,9 @@ var InvestmentRow = React.createClass({
 
 var InvestmentTable = React.createClass({
 	render: function() {
-		var investmentRows = [];
+		investmentRows = [];
 		this.props.investments.forEach(function(investment) {
-			investmentRows.push(<InvestmentRow stockName={investment.company} askPrice={investment.purchasePrice} shares={investment.quantity} />)
+			investmentRows.push(<InvestmentRow id={investment.symbol} stockName={investment.company} askPrice={investment.purchasePrice} shares={investment.quantity} />)
 		});
 		return (
 			<table className="portfolio">
@@ -41,7 +41,7 @@ var InvestmentTable = React.createClass({
 					<th className="currentPortfolioHeader">Quantity</th>
 					<th className="currentPortfolioHeader">Price Paid</th>
 				</thead>
-				<tbody>
+				<tbody id="rows">
 					{investmentRows}
 				</tbody>
 			</table>
@@ -129,7 +129,9 @@ var SearchBar = React.createClass({
 
 var TransactionBar = React.createClass({
 	getInitialState: function() {
-		return {shares: ''};
+		return {
+			shares: ''
+		};
 	},
 	handleQuantityChange: function(e) {
 		this.setState({
@@ -139,15 +141,19 @@ var TransactionBar = React.createClass({
 	handlePurchase: function(e) {
 		e.preventDefault();
 		var quantity = this.state.shares.trim();
-		if(!quantity) {
+		if(!quantity || isNaN(quantity) === true) {
+			alert('Enter a number greater than zero!');
 			return;
 		}
 		this.props.onBuySubmit({shares: quantity});
 		this.setState({shares: ''});		
-	// 	// this.props.onBuySubmit(function(e) {
-	// 	// 	rows.push(<InvestmentRow stockName={this.state.stockName} shares={this.state.shares} askPrice={this.state.askPrice} />);
-	// 	// });	
-	},	
+	},
+	handleSale: function(e) {
+		e.preventDefault();
+		var quantity = this.state.shares.trim();
+		this.props.onSellSubmit({shares: quantity});
+		this.setState({shares: ''});
+	},
 	render: function() {
 		return (
 			<form className="currentStockInput" onSubmit={this.handlePurchase}>
@@ -161,7 +167,7 @@ var TransactionBar = React.createClass({
 					type="submit" 
 					value="Buy" 
 				/>
-				<input type="button" value="Sell" />
+				<input type="button" value="Sell" onClick={this.handleSale} />
 			</form>
 		);
 	}
@@ -177,7 +183,8 @@ var SearchableInvestmentTable = React.createClass({
 			purchasePrice: '',
 			bidPrice: '',
 			shares: '',
-			cash: 100000
+			cash: 100000,
+			investments: []
 		};
 	},
 	handleSymbolSubmit: function(stockSymbol) {
@@ -209,7 +216,7 @@ var SearchableInvestmentTable = React.createClass({
 		});
 	},
 	handleInvestment: function(quantity) {
-		var quantity = quantity.shares;
+		var quantity = parseInt(quantity.shares);
 		var price= this.state.askPrice;
 		var totalPrice= price * quantity;
 		var currentCash= this.state.cash;
@@ -220,11 +227,31 @@ var SearchableInvestmentTable = React.createClass({
 			shares: quantity,
 			cash: availableCash
 		});
-		INVESTMENTS.push({
+		if (this.state.stockName === '') {
+			alert('Enter a symbol first!')
+			return;
+		}
+		this.state.investments.push({
 			company: this.state.stockName,
 			purchasePrice: this.state.askPrice,
-			quantity: quantity
+			quantity: quantity,
+			symbol: this.state.symbol
 		});
+	},
+	handleInvestmentSale: function(quantity) {
+		var quantity = parseInt(quantity.shares);
+		var currentStock = this.state.stockName;
+		var symbol = this.state.symbol;
+		var investments = this.state.investments;
+		for (var i = 0; i < investments.length; i++) {
+			if (investments[i].company === currentStock) {
+				var investment = document.getElementById(symbol);
+				$(investment).find('#shares').text(investments[i].quantity -= quantity);
+				if (investments[i].quantity <= 0) {
+					investment.remove();
+				}
+			}  
+		}
 	},
 	render: function() {
 		return (
@@ -236,9 +263,14 @@ var SearchableInvestmentTable = React.createClass({
 					bid={this.state.bidPrice}
 					ask={this.state.askPrice}  
 				/>
-				<TransactionBar onBuySubmit={this.handleInvestment} />
+				<TransactionBar 
+					company={this.state.stockName}
+					onBuySubmit={this.handleInvestment}
+					investments={this.state.investments}
+					onSellSubmit={this.handleInvestmentSale} 
+				/>
 				<InvestmentTable 
-					investments={this.props.investments}
+					investments={this.state.investments}
 					cash={this.state.cash}
 				/>
 			</div>
@@ -246,10 +278,10 @@ var SearchableInvestmentTable = React.createClass({
 	}
 });
 
-var INVESTMENTS = [];
+// var INVESTMENTS = [];
 
 ReactDOM.render(
-	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" investments={INVESTMENTS} pollInterval={200000} />,
+	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={200000} />,
 	document.getElementById('container')
 );
 
