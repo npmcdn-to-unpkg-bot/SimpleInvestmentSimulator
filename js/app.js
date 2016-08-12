@@ -251,7 +251,6 @@ var SearchableInvestmentTable = React.createClass({
 			shares: '',
 			cash: 100000,
 			investments: [],
-			newPrice: ''
 		};
 	},
 	handleSymbolSubmit: function(stockSymbol) {
@@ -360,8 +359,6 @@ var SearchableInvestmentTable = React.createClass({
 	componentDidMount: function() {
 		this.loadPriceUpdates();
 		setInterval(this.loadPriceUpdates, this.props.pollInterval);
-		this.loadPriceChange();
-		setInterval(this.loadPriceChange, this.props.pollInterval);
 	},
 	render: function() {
 		return (
