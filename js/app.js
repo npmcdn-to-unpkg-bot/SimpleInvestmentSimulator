@@ -250,12 +250,14 @@ var SearchableInvestmentTable = React.createClass({
 			bidPrice: '',
 			shares: '',
 			cash: 100000,
-			investments: []
+			investments: [],
+			newPrice: ''
 		};
 	},
 	handleSymbolSubmit: function(stockSymbol) {
 		var self = this;
 		var stock_symbol = stockSymbol.symbols;
+		console.log(stockSymbol)
 		$.ajax({
 			url: this.props.apiURL,
 			dataType: 'jsonp',
@@ -283,6 +285,29 @@ var SearchableInvestmentTable = React.createClass({
 		// This will display the sliding menu on submit
 		this.refs.left.show();
 	},
+	loadPriceUpdates: function() {
+		var self = this;
+		$.ajax({
+			url: this.props.apiURL,
+			dataType: 'jsonp',
+			type: 'GET',
+			data: {symbols: this.state.symbol},
+			success: function(result) {
+				Object.keys(result).forEach(function(prop) {
+					var stockData = result[prop];
+					self.setState({
+						askPrice: stockData.askPrice,
+						bidPrice: stockData.bidPrice,
+					});
+				});
+				console.log('loadPriceUpdates works');
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+				console.log('loadPriceUpdates fail')
+			}.bind(this)
+		});
+	},
 	handleInvestment: function(quantity) {
 		var quantity = parseInt(quantity.shares);
 		var price= this.state.askPrice;
@@ -303,7 +328,7 @@ var SearchableInvestmentTable = React.createClass({
 			company: this.state.stockName,
 			purchasePrice: this.state.askPrice,
 			quantity: quantity,
-			symbol: this.state.symbol
+			symbol: this.state.symbol,
 		});
 	},
 	handleInvestmentSale: function(quantity) {
@@ -331,6 +356,12 @@ var SearchableInvestmentTable = React.createClass({
 				alert("You cannot sell what you don't have!");  
 		  	}
 		}
+	},
+	componentDidMount: function() {
+		this.loadPriceUpdates();
+		setInterval(this.loadPriceUpdates, this.props.pollInterval);
+		this.loadPriceChange();
+		setInterval(this.loadPriceChange, this.props.pollInterval);
 	},
 	render: function() {
 		return (
@@ -386,7 +417,7 @@ var SearchableInvestmentTable = React.createClass({
 // var INVESTMENTS = [];
 
 ReactDOM.render(
-	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={200000} />,
+	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={10000} />,
 	document.getElementById('container')
 );
 
