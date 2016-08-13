@@ -31,7 +31,7 @@ var InvestmentTable = React.createClass({
 			investmentRows.push(<InvestmentRow id={investment.symbol} stockName={investment.company} askPrice={investment.purchasePrice} shares={investment.quantity} />)
 		});
 		return (
-			<div className="table-responsive_2">
+			<div className="table-responsive">
 				<table className="table table-striped">
 					<thead>
 						<CurrentPortfolioRow cash={this.props.cash} />
@@ -114,7 +114,7 @@ var SearchBar = React.createClass({
 		              		<span className="icon-bar"></span>
 		              		<span className="icon-bar"></span>
 		            	</button>
-		            	<a className="navbar-brand" href="#">The Simple Investment Simulator</a>
+		            	<a className="navbar-brand" href="https://github.com/hernanal/SimpleInvestmentSimulator">The Simple Investment Simulator</a>
 		          	</div>
 					<div id="navbar" className="navbar-collapse collapse">
 						<form className="navbar-form navbar-right" onSubmit={this.handleSubmit}>
@@ -124,7 +124,6 @@ var SearchBar = React.createClass({
 								onChange={this.handleSymbolChange} 
 								placeholder="Enter Stock Symbol..." 
 								className="form-control"
-								id="invest" 
 							/>
 							<input
 								id="currentStock" 
@@ -183,7 +182,8 @@ var TransactionBar = React.createClass({
 				<input 
 					type="button" 
 					value="Sell"
-					onClick={this.handleSale} />
+					onClick={this.handleSale} 
+				/>
 			</form>
 		);
 	}
@@ -366,7 +366,7 @@ var SearchableInvestmentTable = React.createClass({
 				<div>
 					<Menu ref="left" alignment="left">
 						<ul className="nav nav-sidebar">
-							<li className="active"><a href="#">Ready to invest?<span className="sr-only">(current)</span></a></li>
+							<li className="active"><a href="http://www.benzinga.com/">Ready to invest?<span className="sr-only">(current)</span></a></li>
 						</ul>
 						<MenuItem>
 							<CurrentStockTable 
@@ -387,27 +387,21 @@ var SearchableInvestmentTable = React.createClass({
 				<div className="container-fluid">
 			        <div className="row">
 											
-				        <div className="col-sm-8 col-sm-offset-3 col-md-8 col-md-offset-2 main">
-				            <h1 className="page-header">Your Portfolio</h1>
+				        <div className="col-sm-8 col-sm-offset-3 col-md-8 col-md-offset-2 main" id="invest">
+				            <h1 className="page-header">Market Portfolio</h1>
 
 				            <div className="row placeholders">
-					            <div className="placeholder">
-					            	<img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
-					            	<h4>Label</h4>
-					            	<span className="text-muted">Something else</span>
+					            <div className="col-xs-6 col-sm-3 placeholder bull">
+					            	<img src="img/bull.jpg" width="200" height="400" className="img-responsive" alt="Generic placeholder thumbnail" />
 					            </div>
-					            <div className="placeholder">
-					            	<img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
-					            	<h4>Label</h4>
-					            	<span className="text-muted">Something else</span>
+					            <div className="col-xs-6 col-sm-3 placeholder wall_street">
+					            	<img src="img/wall_street.jpg" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
 					            </div>
-					            <div className="placeholder">
-					            	<img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
-					            	<h4>Label</h4>
-					            	<span className="text-muted">Something else</span>
+					            <div className="col-xs-6 col-sm-3 placeholder bear">
+					            	<img src="img/bear.jpg" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
 					            </div>
 			          		</div>
-							<div className="portfolio" >
+							<div className="col-xs-6 col-sm-3 portfolio">
 						        <h2 className="sub-header">Investments</h2>
 								<InvestmentTable 
 									investments={this.state.investments}
@@ -424,7 +418,7 @@ var SearchableInvestmentTable = React.createClass({
 
 ReactDOM.render(
 	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={10000} />,
-	document.getElementById('container')
+	document.getElementById('app_container')
 );
 
 
