@@ -313,6 +313,13 @@ var SearchableInvestmentTable = React.createClass({
 		var totalPrice= price * quantity;
 		var currentCash= this.state.cash;
 		var availableCash= currentCash - totalPrice;
+		var investments = this.state.investments;
+		for (var i = 0; i < investments.length; i++) {
+			if (investments[i].company === this.state.stockName) {
+				alert('You have this stock already. You should diversify!');
+				return;
+			}
+		}
 		this.setState({
 			company: this.state.stockName,
 			purchasePrice: this.state.askPrice,
@@ -321,6 +328,12 @@ var SearchableInvestmentTable = React.createClass({
 		});
 		if (this.state.stockName === '') {
 			alert('Enter a symbol first!')
+			return;
+		} else if (totalPrice > currentCash) {
+			alert('You cannot afford this! Sell some stock.');
+			this.setState({
+				cash: currentCash
+			});
 			return;
 		}
 		this.state.investments.push({
@@ -430,18 +443,6 @@ ReactDOM.render(
 	document.getElementById('container')
 );
 
-
-// Alerts
-
-// Alert if cash will go negative if purchase is made
-
-
-// Bugs
-
-// If multiple investments are made in the same company the app does not recognize that they should be grouped together
-// Write a condition that checks whether the company already exists in the investment table.
-// If so then it should NOT add a new row but instead add the quantity to the existing stock Object
-// It should also add the price paid to the purchase price of the existing object and divide it by two
 
 
 
