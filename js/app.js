@@ -52,17 +52,6 @@ var InvestmentTable = React.createClass({
 	}
 });
 
-var InvestmentPortfolioTable = React.createClass({
-	render: function() {
-		return (
-			<table className="portfolio">
-				<InvestmentTable rows={this.props.rows} />
-			</table>
-		);
-	}
-});
-
-
 var CurrentStockTable = React.createClass({
 	render: function() {
 		return (
@@ -226,12 +215,9 @@ var Menu = React.createClass({
 });
 
 var MenuItem = React.createClass({
-	navigate: function(hash) {
-		window.location.hash = hash;
-	},
 	render: function() {
 		return (
-			<div className="menu-item" onClick={this.navigate.bind(this, this.props.hash)}>
+			<div className="menu-item">
 				{this.props.children}
 			</div>
 		);
@@ -382,7 +368,7 @@ var SearchableInvestmentTable = React.createClass({
 						<ul className="nav nav-sidebar">
 							<li className="active"><a href="#">Ready to invest?<span className="sr-only">(current)</span></a></li>
 						</ul>
-						<MenuItem hash="first-page">
+						<MenuItem>
 							<CurrentStockTable 
 								stockName={this.state.stockName}
 								symbol={this.state.symbol}
@@ -435,8 +421,6 @@ var SearchableInvestmentTable = React.createClass({
 		);
 	}
 });
-
-// var INVESTMENTS = [];
 
 ReactDOM.render(
 	<SearchableInvestmentTable apiURL="http://data.benzinga.com/rest/richquoteDelayed" pollInterval={10000} />,
