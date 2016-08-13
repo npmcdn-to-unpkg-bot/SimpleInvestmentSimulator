@@ -85,7 +85,8 @@ body {
 .main .page-header {
   margin-top: 0;
   /*text-align: center;*/
-  margin-left: 50%;
+  /*margin-left: 50%;*/
+  text-align: center;
 }
 
 
@@ -95,17 +96,19 @@ body {
 
 .placeholders {
   margin-bottom: 30px;
-  align-items: center;
-  margin-left: 50%;
+  text-align: center;
+  margin-left: -30px;
+  margin-right: -100px;
 }
 .placeholders h4 {
   margin-bottom: 0;
 }
 .placeholder {
   /*margin-bottom: 20px;*/
+  display: inline-block;
+  margin-right: 50px;
 }
 .placeholder img {
   display: inline-block;
   border-radius: 50%;
-  width: 60%;
 }

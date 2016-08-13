@@ -41,7 +41,6 @@ var InvestmentTable = React.createClass({
 							<th>Company</th>
 							<th>Quantity</th>
 							<th>Price Paid</th>
-							<th>Profit/Loss</th>					
 						</tr>
 					</thead>
 					<tbody id="rows">
@@ -274,6 +273,7 @@ var SearchableInvestmentTable = React.createClass({
 						askPrice: stockData.askPrice,
 						bidPrice: stockData.bidPrice
 					});
+					console.log(stockData.askPrice);
 				})
 			}.bind(this),
 			error: function(xhr, status, err) {
@@ -392,9 +392,21 @@ var SearchableInvestmentTable = React.createClass({
 				            <h1 className="page-header">Your Portfolio</h1>
 
 				            <div className="row placeholders">
-				              	<div className="col-xs-10 col-sm-12 placeholder">
-				                	<img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
-				        		</div>
+					            <div className="placeholder">
+					            	<img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
+					            	<h4>Label</h4>
+					            	<span className="text-muted">Something else</span>
+					            </div>
+					            <div className="placeholder">
+					            	<img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
+					            	<h4>Label</h4>
+					            	<span className="text-muted">Something else</span>
+					            </div>
+					            <div className="placeholder">
+					            	<img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
+					            	<h4>Label</h4>
+					            	<span className="text-muted">Something else</span>
+					            </div>
 			          		</div>
 							<div className="portfolio" >
 						        <h2 className="sub-header">Investments</h2>
