@@ -83,10 +83,10 @@ var CurrentStockTable = React.createClass({
 					<tbody>
 						<tr>
 							<td>
-								{this.props.bid}
+								${this.props.bid}
 							</td>
 							<td>
-								{this.props.ask}
+								${this.props.ask}
 							</td>
 						</tr>
 					</tbody>
@@ -386,8 +386,8 @@ var SearchableInvestmentTable = React.createClass({
 							<CurrentStockTable 
 								stockName={this.state.stockName}
 								symbol={this.state.symbol}
-								bid={this.state.bidPrice}
-								ask={this.state.askPrice}  
+								bid={numeral(this.state.bidPrice).format('0,0')}
+								ask={numeral(this.state.askPrice).format('0,0')}  
 							/>
 							<TransactionBar 
 								company={this.state.stockName}
@@ -425,7 +425,7 @@ var SearchableInvestmentTable = React.createClass({
 						        <h2 className="sub-header">Investments</h2>
 								<InvestmentTable 
 									investments={this.state.investments}
-									cash={this.state.cash}
+									cash={numeral(this.state.cash).format('0,0.00')}
 								/>
 							</div>
 						</div>
