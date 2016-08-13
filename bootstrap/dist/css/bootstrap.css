@@ -11,6 +11,7 @@ html {
 }
 body {
   margin: 0;
+  max-width: 100%;
 }
 article,
 aside,
@@ -2443,7 +2444,7 @@ table th[class*="col-"] {
 }
 .table-responsive {
   min-height: .01%;
-  /*overflow-x: auto;*/
+  overflow-x: auto;
   width: 100%;
   margin-left: 15%;
 }

@@ -32,7 +32,6 @@ h3 {
 
 .currentStock,
 .portfolio {
-	margin-top: 100px;
 	margin-left: 10px;
 }
 
@@ -57,6 +56,33 @@ h3 {
 
 .currentPortfolioData {
 	height: 40px;
+}
+
+.images {
+	height: 200px;
+}
+
+@media screen and (max-width: 768px) {
+	.container-fluid {
+		margin-left: 0px;
+		max-width: 100%;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.bull {
+		display: none;
+	}
+	.bear {
+		display: none;
+	}
+	.wall_street {
+		display: block;
+		padding-left: 0px;
+	}
+	.col-xs-6 {
+		width: 100%
+	}
 }
 
 

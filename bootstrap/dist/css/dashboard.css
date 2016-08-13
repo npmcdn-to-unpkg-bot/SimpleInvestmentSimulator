@@ -111,4 +111,21 @@ body {
 .placeholder img {
   display: inline-block;
   border-radius: 50%;
+  width: 200px;
+  height: 200px;
+}
+
+@media screen and (max-width: 845px) {
+  .placeholders {
+    display: inline-flex;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .placeholder img {
+    display: block;
+    border-radius: 0%;
+    width: 100%;
+    margin-left: 0px;
+  }
 }
