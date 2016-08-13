@@ -388,21 +388,21 @@ var SearchableInvestmentTable = React.createClass({
 			        <div className="row">
 											
 				        <div className="col-sm-8 col-sm-offset-3 col-md-8 col-md-offset-2 main" id="invest">
-				            <h1 className="page-header">Market Portfolio</h1>
+				            <h1 className="page-header title">Market Portfolio</h1>
 
 				            <div className="row placeholders">
 					            <div className="col-xs-6 col-sm-3 placeholder bull">
-					            	<img src="img/bull.jpg" width="200" height="400" className="img-responsive" alt="Generic placeholder thumbnail" />
+					            	<img src="img/bull.jpg" width="200" height="400" className="img-responsive" alt="The bull statue" />
 					            </div>
 					            <div className="col-xs-6 col-sm-3 placeholder wall_street">
-					            	<img src="img/wall_street.jpg" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
+					            	<img src="img/wall_street.jpg" width="200" height="200" className="img-responsive" alt="Entrance to New York Stock Exchange" />
 					            </div>
 					            <div className="col-xs-6 col-sm-3 placeholder bear">
-					            	<img src="img/bear.jpg" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
+					            	<img src="img/bear.jpg" width="200" height="200" className="img-responsive" alt="Ferocious grizzly bear" />
 					            </div>
 			          		</div>
 							<div className="col-xs-6 col-sm-3 portfolio">
-						        <h2 className="sub-header">Investments</h2>
+						        <h2 className="sub-header title">Investments</h2>
 								<InvestmentTable 
 									investments={this.state.investments}
 									cash={numeral(this.state.cash).format('0,0.00')}

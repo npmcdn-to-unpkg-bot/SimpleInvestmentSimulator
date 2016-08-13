@@ -62,6 +62,10 @@ h3 {
 	height: 200px;
 }
 
+.title {
+	color: #428bca;
+}
+
 @media screen and (max-width: 768px) {
 	.container-fluid {
 		margin-left: 0px;
